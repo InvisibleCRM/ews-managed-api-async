@@ -127,7 +127,7 @@ namespace Microsoft.Exchange.WebServices.Data
                 standardPeriodToSet.Id = string.Format(
                     "{0}/{1}",
                     standardPeriod.Id,
-                    adjustmentRule.DateStart.Year);
+                    adjustmentRule.DateSTart.ToString("yyyyMMdd"));
                 standardPeriodToSet.Name = standardPeriod.Name;
                 standardPeriodToSet.Bias = standardPeriod.Bias;
                 this.timeZoneDefinition.Periods.Add(standardPeriodToSet.Id, standardPeriodToSet);
@@ -143,7 +143,7 @@ namespace Microsoft.Exchange.WebServices.Data
                 daylightPeriod.Id = string.Format(
                     "{0}/{1}",
                     TimeZonePeriod.DaylightPeriodId,
-                    adjustmentRule.DateStart.Year);
+                    adjustmentRule.DateSTart.ToString("yyyyMMdd"));
                 daylightPeriod.Name = TimeZonePeriod.DaylightPeriodName;
                 daylightPeriod.Bias = standardPeriod.Bias - adjustmentRule.DaylightDelta;
 
@@ -158,7 +158,7 @@ namespace Microsoft.Exchange.WebServices.Data
                 standardPeriodToSet.Id = string.Format(
                     "{0}/{1}",
                     standardPeriod.Id,
-                    adjustmentRule.DateStart.Year);
+                    adjustmentRule.DateSTart.ToString("yyyyMMdd"));
                 standardPeriodToSet.Name = standardPeriod.Name;
                 standardPeriodToSet.Bias = standardPeriod.Bias;
                 this.timeZoneDefinition.Periods.Add(standardPeriodToSet.Id, standardPeriodToSet);
