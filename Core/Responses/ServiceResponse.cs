@@ -96,13 +96,22 @@ namespace Microsoft.Exchange.WebServices.Data
                 {
                     this.errorMessage = reader.ReadElementValue(XmlNamespace.Messages, XmlElementNames.MessageText);
                 }
+                else
+                {
+                    reader.ReadElementValue();
+                    if (reader.IsStartElement(XmlNamespace.Messages, XmlElementNames.MessageText))
+                    {
+                        this.errorMessage = reader.ReadElementValue(XmlNamespace.Messages, XmlElementNames.MessageText);
+                    }
+                }
 
                 this.errorCode = reader.ReadElementValue<ServiceError>(XmlNamespace.Messages, XmlElementNames.ResponseCode);
 
                 if (this.result == ServiceResult.Warning)
                 {
                     reader.ReadElementValue<int>(XmlNamespace.Messages, XmlElementNames.DescriptiveLinkKey);
-                }
+                } 
+                
 
                 // If batch processing stopped, EWS returns an empty element. Skip over it.
                 if (this.BatchProcessingStopped)

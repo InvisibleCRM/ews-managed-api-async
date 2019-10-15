@@ -89,8 +89,8 @@ namespace Microsoft.Exchange.WebServices.Data
         {
             var message = new HttpRequestMessage(new HttpMethod(Method), RequestUri);
             message.Content = new StringContent(Content);
-            //if (!string.IsNullOrEmpty(ContentType))
-            //    message.Content.Headers.ContentType = new MediaTypeHeaderValue(ContentType);
+            if (!string.IsNullOrEmpty(ContentType))
+                message.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(ContentType);
 
             if (!string.IsNullOrEmpty(UserAgent))
             {
