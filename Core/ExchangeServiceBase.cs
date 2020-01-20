@@ -32,7 +32,7 @@ namespace Microsoft.Exchange.WebServices.Data
     using System.Net;
     using System.Net.Http;
     using System.Net.Http.Headers;
-#if NETSTANDARD2_0
+#if NETSTANDARD
     using System.Runtime.InteropServices;
 #endif
     using System.Security.Cryptography;
