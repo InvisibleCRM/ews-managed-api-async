@@ -1540,13 +1540,6 @@ namespace Microsoft.Exchange.WebServices.Autodiscover
                 {
                     throw new ServiceLocalException(Strings.CredentialsRequired);
                 }
-
-#if NETSTANDARD2_0
-                // Temporary fix for authentication on Linux platform
-                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    serviceCredentials = AdjustLinuxAuthentication(url, serviceCredentials);
-#endif
-
                 // Make sure that credentials have been authenticated if required
                 serviceCredentials.PreAuthenticate();
 
