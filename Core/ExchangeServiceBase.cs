@@ -32,7 +32,7 @@ namespace Microsoft.Exchange.WebServices.Data
     using System.Net;
     using System.Net.Http;
     using System.Net.Http.Headers;
-#if NETSTANDARD2_0
+#if NETSTANDARD
     using System.Runtime.InteropServices;
 #endif
     using System.Security.Cryptography;
@@ -187,13 +187,6 @@ namespace Microsoft.Exchange.WebServices.Data
                     {
                         throw new ServiceLocalException(Strings.CredentialsRequired);
                     }
-
-#if NETSTANDARD2_0
-                // Temporary fix for authentication on Linux platform
-                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    serviceCredentials = AdjustLinuxAuthentication(url, serviceCredentials);
-#endif
-
                     // Make sure that credentials have been authenticated if required
                     serviceCredentials.PreAuthenticate();
 
