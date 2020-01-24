@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <VersionPrefix>2.2.9</VersionPrefix>
     <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <AssemblyName>Microsoft.Exchange.WebServices.NETStandard</AssemblyName>
-    <PackageId>Microsoft.Exchange.WebServices.NETStandard</PackageId>
+    <PackageId>Microsoft.Exchange.WebServices.NETStandard-comless</PackageId>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -13,40 +13,29 @@
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>sherlock1982</Authors>
-    <RepositoryUrl>https://github.com/sherlock1982/ews-managed-api</RepositoryUrl>
+    <Authors>scttstrck</Authors>
+    <RepositoryUrl>https://github.com/scttstrck/ews-managed-api</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>ews exchange office365 Microsoft Web API Email Client Library C#</PackageTags>
-    <PackageProjectUrl>https://github.com/sherlock1982/ews-managed-api</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/scttstrck/ews-managed-api</PackageProjectUrl>
     <Title>Microsoft.Exchange.WebServices.NETStandard</Title>
     <Description>The Exchange Web Services (EWS) Managed API provides a managed interface for developing .NET client applications that use EWS. By using the EWS Managed API, you can access almost all the information stored in an Office 365, Exchange Online, or Exchange Server mailbox.</Description>
-    <PackageReleaseNotes>removed obsolete WebRequests and switched to HttpClient internally
-fixed issue with file attachements downloads
-restored ldap autodiscover functionality
-merged changes from official Microsoft repository
-added cancellation token for most of methods
+    <PackageReleaseNotes>
+      removed obsolete WebRequests and switched to HttpClient internally
+      fixed issue with file attachements downloads
+      restored ldap autodiscover functionality
+      merged changes from official Microsoft repository
+      added cancellation token for most of methods
+      merged changes from other repos: svrooij dimdron real-magic
+      targeting netstandard2.1
     </PackageReleaseNotes>
+    <Version>2.2.9</Version>
   </PropertyGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Security" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="4.7.0">
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Credentials\BasicAuthModuleForUTF8.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.DirectoryServices" Version="4.7.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="4.7.0" />
   </ItemGroup>
 
 </Project>

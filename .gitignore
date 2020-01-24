@@ -184,3 +184,5 @@ UpgradeLog*.htm
 FakesAssemblies/
 /project.lock.json
 /.svn
+/.vs/Microsoft.Exchange.WebServices.NETStandard/v16/Server/sqlite3
+/.vs/Microsoft.Exchange.WebServices.NETStandard/DesignTimeBuild/.dtbcache
