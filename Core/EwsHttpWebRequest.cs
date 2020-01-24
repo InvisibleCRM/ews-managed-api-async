@@ -109,7 +109,7 @@ namespace Microsoft.Exchange.WebServices.Data
             HttpResponseMessage response = null;
             try
             {
-                response = await _httpClient.SendAsync(message, token);
+                response = await _httpClient.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, token);
             }
             catch(Exception exception)
             {
