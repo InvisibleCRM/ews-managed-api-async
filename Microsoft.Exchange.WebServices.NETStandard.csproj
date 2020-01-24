@@ -4,7 +4,7 @@
     <VersionPrefix>2.2.9</VersionPrefix>
     <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <AssemblyName>Microsoft.Exchange.WebServices.NETStandard</AssemblyName>
-    <PackageId>Microsoft.Exchange.WebServices.NETStandard-comless</PackageId>
+    <PackageId>Comless.Exchange.WebServices.NETStandard</PackageId>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -30,12 +30,21 @@
       targeting netstandard2.1
     </PackageReleaseNotes>
     <Version>2.2.9</Version>
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <PackageLicenseFile>license.txt</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.DirectoryServices" Version="4.7.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Security.Cryptography.Xml" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="license.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
