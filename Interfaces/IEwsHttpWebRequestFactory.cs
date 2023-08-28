@@ -40,7 +40,7 @@ namespace Microsoft.Exchange.WebServices.Data
         /// <returns>
         /// An object that implements the <see cref="IEwsHttpWebRequest"/> interface.
         /// </returns>
-        IEwsHttpWebRequest CreateRequest(Uri uri);
+        IEwsHttpWebRequest CreateRequest(Uri uri, string httpClientName);
 
         /// <summary>
         /// Creates the exception response.

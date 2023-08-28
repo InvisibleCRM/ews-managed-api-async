@@ -72,14 +72,6 @@ namespace Microsoft.Exchange.WebServices.Data
         }
 
         /// <summary>
-        /// Gets or sets a value that indicates whether the request should follow redirection responses.
-        /// </summary>
-        bool AllowAutoRedirect
-        { 
-            get; set; 
-        }
-
-        /// <summary>
         /// Gets or sets the client certificates.
         /// </summary>
         /// <returns>The collection of X509 client certificates.</returns>
@@ -139,18 +131,18 @@ namespace Microsoft.Exchange.WebServices.Data
         /// Gets or sets a value that indicates whether to send an authenticate header with the request.
         /// </summary>
         /// <returns>true to send a WWW-authenticate HTTP header with requests after authentication has taken place; otherwise, false. The default is false.</returns>
-        bool PreAuthenticate
-        { 
-            get; set; 
-        }
+        //bool PreAuthenticate
+        //{ 
+        //    get; set; 
+        //}
 
         /// <summary>
         /// Gets or sets proxy information for the request.
         /// </summary>
-        IWebProxy Proxy
-        {
-            get; set;
-        }
+        //IWebProxy Proxy
+        //{
+        //    get; set;
+        //}
 
         /// <summary>
         /// Gets the original Uniform Resource Identifier (URI) of the request.
@@ -174,10 +166,10 @@ namespace Microsoft.Exchange.WebServices.Data
         /// Gets or sets a <see cref="T:System.Boolean"/> value that controls whether default credentials are sent with requests.
         /// </summary>
         /// <returns>true if the default credentials are used; otherwise false. The default value is false.</returns>
-        bool UseDefaultCredentials
-        { 
-            get; set; 
-        }
+        //bool UseDefaultCredentials
+        //{ 
+        //    get; set; 
+        //}
 
         /// <summary>
         /// Gets or sets the value of the User-agent HTTP header.
