@@ -35,6 +35,7 @@ namespace Microsoft.Exchange.WebServices.Data
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.Exchange.WebServices.NETStandard.Core;
 
     /// <summary>
     /// Represents an implementation of the IEwsHttpWebRequest interface that uses HttpWebRequest.
@@ -45,19 +46,17 @@ namespace Microsoft.Exchange.WebServices.Data
         /// Underlying HttpWebRequest.
         /// </summary>
         readonly HttpClient _httpClient;
-        readonly HttpClientHandler _httpClientHandler;
+        readonly HttpHandlerProxy _httpClientHandler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EwsHttpWebRequest"/> class.
         /// </summary>
         /// <param name="uri">The URI.</param>
-        internal EwsHttpWebRequest(Uri uri)
+        internal EwsHttpWebRequest(Uri uri, IHttpMessageHandlerFactory httpMessageHandlerFactory, string httpClientName)
         {
             Method = "GET";
             RequestUri = uri;
-            _httpClientHandler = new HttpClientHandler() {
-                AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip
-            };
+            _httpClientHandler = new HttpHandlerProxy(httpMessageHandlerFactory, httpClientName);
             _httpClient = new HttpClient(_httpClientHandler);
         }
 
@@ -137,19 +136,6 @@ namespace Microsoft.Exchange.WebServices.Data
         }
 
         /// <summary>
-        /// Gets or sets a value that indicates whether the request should follow redirection responses.
-        /// </summary>
-        /// <returns>
-        /// True if the request should automatically follow redirection responses from the Internet resource; otherwise, false.
-        /// The default value is true.
-        /// </returns>
-        bool IEwsHttpWebRequest.AllowAutoRedirect
-        {
-            get { return _httpClientHandler.AllowAutoRedirect; }
-            set { _httpClientHandler.AllowAutoRedirect = value; }
-        }
-
-        /// <summary>
         /// Gets or sets the client certificates.
         /// </summary>
         /// <value></value>
@@ -213,21 +199,21 @@ namespace Microsoft.Exchange.WebServices.Data
         /// <summary>
         /// Gets or sets proxy information for the request.
         /// </summary>
-        public IWebProxy Proxy
-        {
-            get { return _httpClientHandler.Proxy; }
-            set { _httpClientHandler.Proxy = value; }
-        }
+        //public IWebProxy Proxy
+        //{
+        //    get { return _httpClientHandler.Proxy; }
+        //    set { _httpClientHandler.Proxy = value; }
+        //}
 
         /// <summary>
         /// Gets or sets a value that indicates whether to send an authenticate header with the request.
         /// </summary>
         /// <returns>true to send a WWW-authenticate HTTP header with requests after authentication has taken place; otherwise, false. The default is false.</returns>
-        public bool PreAuthenticate
-        {
-            get { return _httpClientHandler.PreAuthenticate; }
-            set { _httpClientHandler.PreAuthenticate = value; }
-        }
+        //public bool PreAuthenticate
+        //{
+        //    get { return _httpClientHandler.PreAuthenticate; }
+        //    set { _httpClientHandler.PreAuthenticate = value; }
+        //}
 
         /// <summary>
         /// Gets the original Uniform Resource Identifier (URI) of the request.
@@ -252,11 +238,11 @@ namespace Microsoft.Exchange.WebServices.Data
         /// Gets or sets a <see cref="T:System.Boolean"/> value that controls whether default credentials are sent with requests.
         /// </summary>
         /// <returns>true if the default credentials are used; otherwise false. The default value is false.</returns>
-        public bool UseDefaultCredentials
-        {
-            get { return this._httpClientHandler.UseDefaultCredentials; }
-            set { this._httpClientHandler.UseDefaultCredentials = value; }
-        }
+        //public bool UseDefaultCredentials
+        //{
+        //    get { return this._httpClientHandler.UseDefaultCredentials; }
+        //    set { this._httpClientHandler.UseDefaultCredentials = value; }
+        //}
 
         /// <summary>
         /// Gets or sets the value of the User-agent HTTP header.

@@ -34,6 +34,13 @@ namespace Microsoft.Exchange.WebServices.Data
     /// </summary>
     internal class EwsHttpWebRequestFactory : IEwsHttpWebRequestFactory
     {
+        private readonly IHttpMessageHandlerFactory _httpMessageHandlerFactory;
+
+        public EwsHttpWebRequestFactory(IHttpMessageHandlerFactory httpMessageHandlerFactory) 
+        {
+            _httpMessageHandlerFactory = httpMessageHandlerFactory;
+        }
+
         #region IEwsHttpWebRequestFactory Members
 
         /// <summary>
@@ -41,9 +48,9 @@ namespace Microsoft.Exchange.WebServices.Data
         /// </summary>
         /// <param name="uri">The service URI.</param>
         /// <returns>An instance of <see cref="IEwsHttpWebRequest"/>./// </returns>
-        IEwsHttpWebRequest IEwsHttpWebRequestFactory.CreateRequest(Uri uri)
+        IEwsHttpWebRequest IEwsHttpWebRequestFactory.CreateRequest(Uri uri, string httpClientName)
         {
-            return new EwsHttpWebRequest(uri);
+            return new EwsHttpWebRequest(uri, _httpMessageHandlerFactory, httpClientName);
         }
 
         /// <summary>

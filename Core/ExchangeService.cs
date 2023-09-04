@@ -40,6 +40,7 @@ namespace Microsoft.Exchange.WebServices.Data
     using Microsoft.Exchange.WebServices.Data.Groups;
     using System.Threading.Tasks;
     using System.Threading;
+    using System.Net.Http;
 
     /// <summary>
     /// Represents a binding to the Exchange Web Services.
@@ -49,6 +50,8 @@ namespace Microsoft.Exchange.WebServices.Data
         #region Constants
 
         private const string TargetServerVersionHeaderName = "X-EWS-TargetVersion";
+
+        internal const string HttpClientName = "exchange";
 
         #endregion
 
@@ -4579,7 +4582,7 @@ namespace Microsoft.Exchange.WebServices.Data
             ExchangeVersion requestedServerVersion,
             AutodiscoverRedirectionUrlValidationCallback validateRedirectionUrlCallback)
         {
-            AutodiscoverService autodiscoverService = new AutodiscoverService(this, requestedServerVersion)
+            AutodiscoverService autodiscoverService = new AutodiscoverService(this, requestedServerVersion, httpMessageHandlerFactory)
             {
                 RedirectionUrlValidationCallback = validateRedirectionUrlCallback,
                 EnableScpLookup = this.EnableScpLookup
@@ -5125,8 +5128,8 @@ namespace Microsoft.Exchange.WebServices.Data
         /// Initializes a new instance of the <see cref="ExchangeService"/> class, targeting
         /// the latest supported version of EWS and scoped to the system's current time zone.
         /// </summary>
-        public ExchangeService()
-            : base()
+        public ExchangeService(IHttpMessageHandlerFactory httpMessageHandlerFactory = null)
+            : base(httpMessageHandlerFactory)
         {
         }
 
@@ -5135,8 +5138,8 @@ namespace Microsoft.Exchange.WebServices.Data
         /// the latest supported version of EWS and scoped to the specified time zone.
         /// </summary>
         /// <param name="timeZone">The time zone to which the service is scoped.</param>
-        public ExchangeService(TimeZoneInfo timeZone)
-            : base(timeZone)
+        public ExchangeService(TimeZoneInfo timeZone, IHttpMessageHandlerFactory httpMessageHandlerFactory = null)
+            : base(timeZone, httpMessageHandlerFactory)
         {
         }
 
@@ -5145,8 +5148,8 @@ namespace Microsoft.Exchange.WebServices.Data
         /// the specified version of EWS and scoped to the system's current time zone.
         /// </summary>
         /// <param name="requestedServerVersion">The version of EWS that the service targets.</param>
-        public ExchangeService(ExchangeVersion requestedServerVersion)
-            : base(requestedServerVersion)
+        public ExchangeService(ExchangeVersion requestedServerVersion, IHttpMessageHandlerFactory httpMessageHandlerFactory = null)
+            : base(requestedServerVersion, httpMessageHandlerFactory)
         {
         }
 
@@ -5156,8 +5159,8 @@ namespace Microsoft.Exchange.WebServices.Data
         /// </summary>
         /// <param name="requestedServerVersion">The version of EWS that the service targets.</param>
         /// <param name="timeZone">The time zone to which the service is scoped.</param>
-        public ExchangeService(ExchangeVersion requestedServerVersion, TimeZoneInfo timeZone)
-            : base(requestedServerVersion, timeZone)
+        public ExchangeService(ExchangeVersion requestedServerVersion, TimeZoneInfo timeZone, IHttpMessageHandlerFactory httpMessageHandlerFactory = null)
+            : base(requestedServerVersion, timeZone, httpMessageHandlerFactory)
         {
         }
 
@@ -5174,8 +5177,8 @@ namespace Microsoft.Exchange.WebServices.Data
         ///   X-EWS-TargetVersion: 2.4
         ///   X-EWS_TargetVersion: 2.9; minimum=2.4
         /// </remarks>
-        internal ExchangeService(string targetServerVersion)
-            : base(ExchangeVersion.Exchange2013)
+        internal ExchangeService(string targetServerVersion, IHttpMessageHandlerFactory httpMessageHandlerFactory = null)
+            : base(ExchangeVersion.Exchange2013, httpMessageHandlerFactory)
         {
             ExchangeService.ValidateTargetVersion(targetServerVersion);
             this.TargetServerVersion = targetServerVersion;
@@ -5195,8 +5198,8 @@ namespace Microsoft.Exchange.WebServices.Data
         ///   2.4
         ///   2.9; minimum=2.4
         /// </remarks>
-        internal ExchangeService(string targetServerVersion, TimeZoneInfo timeZone)
-            : base(ExchangeVersion.Exchange2013, timeZone)
+        internal ExchangeService(string targetServerVersion, TimeZoneInfo timeZone, IHttpMessageHandlerFactory httpMessageHandlerFactory = null)
+            : base(ExchangeVersion.Exchange2013, timeZone, httpMessageHandlerFactory)
         {
             ExchangeService.ValidateTargetVersion(targetServerVersion);
             this.TargetServerVersion = targetServerVersion;
@@ -5223,7 +5226,7 @@ namespace Microsoft.Exchange.WebServices.Data
             IEwsHttpWebRequest request = this.PrepareHttpWebRequestForUrl(
                 endpoint,
                 this.AcceptGzipEncoding,
-                true);
+                HttpClientName);
 
             if (!String.IsNullOrEmpty(this.TargetServerVersion))
             {

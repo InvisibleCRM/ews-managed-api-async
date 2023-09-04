@@ -76,13 +76,13 @@ namespace Microsoft.Exchange.WebServices.Data
         public event ResponseHeadersCapturedHandler OnResponseHeadersCaptured;
         
         private ExchangeCredentials credentials;
-        private bool useDefaultCredentials;
+        //private bool useDefaultCredentials;
         private int timeout = 100000;
         private bool traceEnabled;
         private bool sendClientLatencies = true;
         private TraceFlags traceFlags = TraceFlags.All;
         private ITraceListener traceListener = new EwsTraceListener();
-        private bool preAuthenticate;
+        //private bool preAuthenticate;
         private string userAgent = ExchangeService.defaultUserAgent;
         private bool acceptGzipEncoding = true;
         private bool keepAlive = true;
@@ -93,10 +93,12 @@ namespace Microsoft.Exchange.WebServices.Data
         private TimeZoneInfo timeZone;
         private TimeZoneDefinition timeZoneDefinition;
         private ExchangeServerInfo serverInfo;
-        private IWebProxy webProxy;
+        //private IWebProxy webProxy;
         private IDictionary<string, string> httpHeaders = new Dictionary<string, string>();
         private IDictionary<string, string> httpResponseHeaders = new Dictionary<string, string>();
-        private IEwsHttpWebRequestFactory ewsHttpWebRequestFactory = new EwsHttpWebRequestFactory();  
+        private IEwsHttpWebRequestFactory ewsHttpWebRequestFactory;
+        
+        protected IHttpMessageHandlerFactory httpMessageHandlerFactory;
         #endregion
 
         #region Event handlers
@@ -128,12 +130,11 @@ namespace Microsoft.Exchange.WebServices.Data
         /// </summary>
         /// <param name="url">The URL that the HttpWebRequest should target.</param>
         /// <param name="acceptGzipEncoding">If true, ask server for GZip compressed content.</param>
-        /// <param name="allowAutoRedirect">If true, redirection responses will be automatically followed.</param>
         /// <returns>A initialized instance of HttpWebRequest.</returns>
         internal IEwsHttpWebRequest PrepareHttpWebRequestForUrl(
             Uri url,
             bool acceptGzipEncoding,
-            bool allowAutoRedirect)
+            string httpClientName)
         {
             // Verify that the protocol is something that we can handle
             if ((url.Scheme != "http") && (url.Scheme != "https"))
@@ -141,16 +142,15 @@ namespace Microsoft.Exchange.WebServices.Data
                 throw new ServiceLocalException(string.Format(Strings.UnsupportedWebProtocol, url.Scheme));
             }
 
-            IEwsHttpWebRequest request = this.HttpWebRequestFactory.CreateRequest(url);
+            IEwsHttpWebRequest request = this.HttpWebRequestFactory.CreateRequest(url, httpClientName);
             try
             {
 
-                request.PreAuthenticate = this.PreAuthenticate;
+                //request.PreAuthenticate = this.PreAuthenticate;
                 request.Timeout = this.Timeout;
                 this.SetContentType(request);
                 request.Method = "POST";
                 request.UserAgent = this.UserAgent;
-                request.AllowAutoRedirect = allowAutoRedirect;
                 request.CookieContainer = this.CookieContainer;
                 request.KeepAlive = this.keepAlive;
                 request.ConnectionGroupName = this.connectionGroupName;
@@ -169,18 +169,18 @@ namespace Microsoft.Exchange.WebServices.Data
                     }
                 }
 
-                if (this.webProxy != null)
-                {
-                    request.Proxy = this.webProxy;
-                }
+                //if (this.webProxy != null)
+                //{
+                //    request.Proxy = this.webProxy;
+                //}
 
                 if (this.HttpHeaders.Count > 0)
                 {
                     this.HttpHeaders.ForEach((kv) => request.Headers.TryAddWithoutValidation(kv.Key, kv.Value));
                 }
 
-                request.UseDefaultCredentials = this.UseDefaultCredentials;
-                if (!request.UseDefaultCredentials)
+                //request.UseDefaultCredentials = this.UseDefaultCredentials;
+                if (null != Credentials)
                 {
                     ExchangeCredentials serviceCredentials = this.Credentials;
                     if (serviceCredentials == null)
@@ -530,8 +530,8 @@ namespace Microsoft.Exchange.WebServices.Data
         /// <summary>
         /// Initializes a new instance of the <see cref="ExchangeServiceBase"/> class.
         /// </summary>
-        internal ExchangeServiceBase()
-            : this(TimeZoneInfo.Local)
+        internal ExchangeServiceBase(IHttpMessageHandlerFactory httpMessageHandlerFactory)
+            : this(TimeZoneInfo.Local, httpMessageHandlerFactory)
         {
         }
 
@@ -539,18 +539,20 @@ namespace Microsoft.Exchange.WebServices.Data
         /// Initializes a new instance of the <see cref="ExchangeServiceBase"/> class.
         /// </summary>
         /// <param name="timeZone">The time zone to which the service is scoped.</param>
-        internal ExchangeServiceBase(TimeZoneInfo timeZone)
+        internal ExchangeServiceBase(TimeZoneInfo timeZone, IHttpMessageHandlerFactory httpMessageHandlerFactory)
         {
             this.timeZone = timeZone;
-            this.UseDefaultCredentials = true;
+            //this.UseDefaultCredentials = true;
+            this.ewsHttpWebRequestFactory = new EwsHttpWebRequestFactory(httpMessageHandlerFactory);
+            this.httpMessageHandlerFactory = httpMessageHandlerFactory;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExchangeServiceBase"/> class.
         /// </summary>
         /// <param name="requestedServerVersion">The requested server version.</param>
-        internal ExchangeServiceBase(ExchangeVersion requestedServerVersion)
-            : this(requestedServerVersion, TimeZoneInfo.Local)
+        internal ExchangeServiceBase(ExchangeVersion requestedServerVersion, IHttpMessageHandlerFactory httpMessageHandlerFactory)
+            : this(requestedServerVersion, TimeZoneInfo.Local, httpMessageHandlerFactory)
         {
         }
 
@@ -559,8 +561,8 @@ namespace Microsoft.Exchange.WebServices.Data
         /// </summary>
         /// <param name="requestedServerVersion">The requested server version.</param>
         /// <param name="timeZone">The time zone to which the service is scoped.</param>
-        internal ExchangeServiceBase(ExchangeVersion requestedServerVersion, TimeZoneInfo timeZone)
-            : this(timeZone)
+        internal ExchangeServiceBase(ExchangeVersion requestedServerVersion, TimeZoneInfo timeZone, IHttpMessageHandlerFactory httpMessageHandlerFactory)
+            : this(timeZone, httpMessageHandlerFactory)
         {
             this.requestedServerVersion = requestedServerVersion;
         }
@@ -570,16 +572,16 @@ namespace Microsoft.Exchange.WebServices.Data
         /// </summary>
         /// <param name="service">The other service.</param>
         /// <param name="requestedServerVersion">The requested server version.</param>
-        internal ExchangeServiceBase(ExchangeServiceBase service, ExchangeVersion requestedServerVersion)
-            : this(requestedServerVersion)
+        internal ExchangeServiceBase(ExchangeServiceBase service, ExchangeVersion requestedServerVersion, IHttpMessageHandlerFactory httpMessageHandlerFactory)
+            : this(requestedServerVersion, httpMessageHandlerFactory)
         {
-            this.useDefaultCredentials = service.useDefaultCredentials;
+            //this.useDefaultCredentials = service.useDefaultCredentials;
             this.credentials = service.credentials;
             this.traceEnabled = service.traceEnabled;
             this.traceListener = service.traceListener;
             this.traceFlags = service.traceFlags;
             this.timeout = service.timeout;
-            this.preAuthenticate = service.preAuthenticate;
+            //this.preAuthenticate = service.preAuthenticate;
             this.userAgent = service.userAgent;
             this.acceptGzipEncoding = service.acceptGzipEncoding;
             this.keepAlive = service.keepAlive;
@@ -587,15 +589,15 @@ namespace Microsoft.Exchange.WebServices.Data
             this.timeZone = service.timeZone;
             this.httpHeaders = service.httpHeaders;
             this.ewsHttpWebRequestFactory = service.ewsHttpWebRequestFactory;
-            this.webProxy = service.webProxy;
+            //this.webProxy = service.webProxy;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExchangeServiceBase"/> class from existing one.
         /// </summary>
         /// <param name="service">The other service.</param>
-        internal ExchangeServiceBase(ExchangeServiceBase service)
-            : this(service, service.RequestedServerVersion)
+        internal ExchangeServiceBase(ExchangeServiceBase service, IHttpMessageHandlerFactory httpMessageHandlerFactory)
+            : this(service, service.RequestedServerVersion, httpMessageHandlerFactory)
         {
         }
 
@@ -733,7 +735,7 @@ namespace Microsoft.Exchange.WebServices.Data
             set
             {
                 this.credentials = value;
-                this.useDefaultCredentials = false;
+                //this.useDefaultCredentials = false;
                 this.cookieContainer = new CookieContainer();       // Changing credentials resets the Cookie container
             }
         }
@@ -743,24 +745,24 @@ namespace Microsoft.Exchange.WebServices.Data
         /// authenticate with the Exchange Web Services. Setting UseDefaultCredentials to true automatically sets the Credentials
         /// property to null.
         /// </summary>
-        public bool UseDefaultCredentials
-        {
-            get
-            {
-                return this.useDefaultCredentials;
-            }
+        //public bool UseDefaultCredentials
+        //{
+        //    get
+        //    {
+        //        return this.useDefaultCredentials;
+        //    }
 
-            set
-            {
-                this.useDefaultCredentials = value;
+        //    set
+        //    {
+        //        this.useDefaultCredentials = value;
 
-                if (value)
-                {
-                    this.credentials = null;
-                    this.cookieContainer = new CookieContainer();   // Changing credentials resets the Cookie container
-                }
-            }
-        }
+        //        if (value)
+        //        {
+        //            this.credentials = null;
+        //            this.cookieContainer = new CookieContainer();   // Changing credentials resets the Cookie container
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Gets or sets the timeout used when sending HTTP requests and when receiving HTTP responses, in milliseconds.
@@ -787,11 +789,11 @@ namespace Microsoft.Exchange.WebServices.Data
         /// <summary>
         /// Gets or sets a value that indicates whether HTTP pre-authentication should be performed.
         /// </summary>
-        public bool PreAuthenticate
-        {
-            get { return this.preAuthenticate; }
-            set { this.preAuthenticate = value; }
-        }
+        //public bool PreAuthenticate
+        //{
+        //    get { return this.preAuthenticate; }
+        //    set { this.preAuthenticate = value; }
+        //}
 
         /// <summary>
         /// Gets or sets a value indicating whether GZip compression encoding should be accepted.
@@ -839,11 +841,11 @@ namespace Microsoft.Exchange.WebServices.Data
         /// Gets or sets the web proxy that should be used when sending requests to EWS.
         /// Set this property to null to use the default web proxy.
         /// </summary>
-        public IWebProxy WebProxy
-        {
-            get { return this.webProxy; }
-            set { this.webProxy = value; }
-        }
+        //public IWebProxy WebProxy
+        //{
+        //    get { return this.webProxy; }
+        //    set { this.webProxy = value; }
+        //}
 
         /// <summary>
         /// Gets or sets if the request to the internet resource should contain a Connection HTTP header with the value Keep-alive
@@ -943,7 +945,7 @@ namespace Microsoft.Exchange.WebServices.Data
             set
             {
                 // If new value is null, reset to default factory.
-                this.ewsHttpWebRequestFactory = (value == null) ? new EwsHttpWebRequestFactory() : value;
+                this.ewsHttpWebRequestFactory = (value == null) ? new EwsHttpWebRequestFactory(httpMessageHandlerFactory) : value;
             }
         }
 

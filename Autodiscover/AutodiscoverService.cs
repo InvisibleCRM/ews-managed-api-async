@@ -33,11 +33,13 @@ namespace Microsoft.Exchange.WebServices.Autodiscover
     using System.Text.RegularExpressions;
     using System.Xml;
     using Microsoft.Exchange.WebServices.Data;
+    using Microsoft.Exchange.WebServices.NETStandard.Core;
     using System.Threading.Tasks;
     using System.Net.Http;
     using System.Net.Http.Headers;
 #if NETSTANDARD
     using System.Runtime.InteropServices;
+    using Microsoft.Exchange.WebServices.NETStandard.Extensions;
 #endif
 
     /// <summary>
@@ -140,6 +142,8 @@ namespace Microsoft.Exchange.WebServices.Autodiscover
         /// Minimum request version for Autodiscover SOAP service.
         /// </summary>
         private const ExchangeVersion MinimumRequestVersionForAutoDiscoverSoapService = ExchangeVersion.Exchange2010;
+
+        internal const string HttpClientName = "autodiscover";
 
         #endregion
 
@@ -1370,7 +1374,7 @@ namespace Microsoft.Exchange.WebServices.Autodiscover
 
                 try
                 {
-                    using (var client = new HttpClient(new HttpClientHandler() { AllowAutoRedirect = false }) {
+                    using (var client = new HttpClient(httpMessageHandlerFactory?.CreateHandler(HttpClientName) ?? HttpClientExtensions.CreateHttpClientHandler(HttpClientName)) {
                         Timeout = AutodiscoverTimeout
                     })
                     {
@@ -1519,21 +1523,14 @@ namespace Microsoft.Exchange.WebServices.Autodiscover
 
         internal HttpClient PrepareHttpClient()
         {
-            var httpClientHandler = new HttpClientHandler()
-            {
-                PreAuthenticate = this.PreAuthenticate,
-                AllowAutoRedirect = false,
-                CookieContainer = this.CookieContainer,
-                UseDefaultCredentials = this.UseDefaultCredentials,
-            };
+            var httpClientHandler = new HttpHandlerProxy(httpMessageHandlerFactory, HttpClientName);
 
-            if (this.WebProxy != null)
-            {
-                httpClientHandler.Proxy = this.WebProxy;
-                httpClientHandler.UseProxy = true;
-            }
+            //if (this.WebProxy != null)
+            //{
+            //    httpClientHandler.Proxy = this.WebProxy;
+            //}
 
-            if (!UseDefaultCredentials)
+            if (null != Credentials)
             {
                 ExchangeCredentials serviceCredentials = this.Credentials;
                 if (serviceCredentials == null)
@@ -1546,6 +1543,7 @@ namespace Microsoft.Exchange.WebServices.Autodiscover
                 // TODO support different credentials
                 if (!(serviceCredentials is WebCredentials))
                     throw new NotImplementedException();
+
                 httpClientHandler.Credentials = (this.Credentials as WebCredentials)?.Credentials;
 
                 // Apply credentials to the request
@@ -1595,8 +1593,8 @@ namespace Microsoft.Exchange.WebServices.Autodiscover
         /// <summary>
         /// Initializes a new instance of the <see cref="AutodiscoverService"/> class.
         /// </summary>
-        public AutodiscoverService()
-            : this(ExchangeVersion.Exchange2010)
+        public AutodiscoverService(IHttpMessageHandlerFactory httpMessageHandlerFactory = null)
+            : this(ExchangeVersion.Exchange2010, httpMessageHandlerFactory)
         {
         }
 
@@ -1604,8 +1602,8 @@ namespace Microsoft.Exchange.WebServices.Autodiscover
         /// Initializes a new instance of the <see cref="AutodiscoverService"/> class.
         /// </summary>
         /// <param name="requestedServerVersion">The requested server version.</param>
-        public AutodiscoverService(ExchangeVersion requestedServerVersion)
-            : this(null, null, requestedServerVersion)
+        public AutodiscoverService(ExchangeVersion requestedServerVersion, IHttpMessageHandlerFactory httpMessageHandlerFactory = null)
+            : this(null, null, requestedServerVersion, httpMessageHandlerFactory)
         {
         }
 
@@ -1613,8 +1611,8 @@ namespace Microsoft.Exchange.WebServices.Autodiscover
         /// Initializes a new instance of the <see cref="AutodiscoverService"/> class.
         /// </summary>
         /// <param name="domain">The domain that will be used to determine the URL of the service.</param>
-        public AutodiscoverService(string domain)
-            : this(null, domain)
+        public AutodiscoverService(string domain, IHttpMessageHandlerFactory httpMessageHandlerFactory = null)
+            : this(null, domain, httpMessageHandlerFactory)
         {
         }
 
@@ -1623,8 +1621,8 @@ namespace Microsoft.Exchange.WebServices.Autodiscover
         /// </summary>
         /// <param name="domain">The domain that will be used to determine the URL of the service.</param>
         /// <param name="requestedServerVersion">The requested server version.</param>
-        public AutodiscoverService(string domain, ExchangeVersion requestedServerVersion)
-            : this(null, domain, requestedServerVersion)
+        public AutodiscoverService(string domain, ExchangeVersion requestedServerVersion, IHttpMessageHandlerFactory httpMessageHandlerFactory = null)
+            : this(null, domain, requestedServerVersion, httpMessageHandlerFactory)
         {
         }
 
@@ -1632,8 +1630,8 @@ namespace Microsoft.Exchange.WebServices.Autodiscover
         /// Initializes a new instance of the <see cref="AutodiscoverService"/> class.
         /// </summary>
         /// <param name="url">The URL of the service.</param>
-        public AutodiscoverService(Uri url)
-            : this(url, url.Host)
+        public AutodiscoverService(Uri url, IHttpMessageHandlerFactory httpMessageHandlerFactory = null)
+            : this(url, url.Host, httpMessageHandlerFactory)
         {
         }
 
@@ -1642,8 +1640,8 @@ namespace Microsoft.Exchange.WebServices.Autodiscover
         /// </summary>
         /// <param name="url">The URL of the service.</param>
         /// <param name="requestedServerVersion">The requested server version.</param>
-        public AutodiscoverService(Uri url, ExchangeVersion requestedServerVersion)
-            : this(url, url.Host, requestedServerVersion)
+        public AutodiscoverService(Uri url, ExchangeVersion requestedServerVersion, IHttpMessageHandlerFactory httpMessageHandlerFactory = null)
+            : this(url, url.Host, requestedServerVersion, httpMessageHandlerFactory)
         {
         }
 
@@ -1652,8 +1650,8 @@ namespace Microsoft.Exchange.WebServices.Autodiscover
         /// </summary>
         /// <param name="url">The URL of the service.</param>
         /// <param name="domain">The domain that will be used to determine the URL of the service.</param>
-        internal AutodiscoverService(Uri url, string domain)
-            : base()
+        internal AutodiscoverService(Uri url, string domain, IHttpMessageHandlerFactory httpMessageHandlerFactory = null)
+            : base(httpMessageHandlerFactory)
         {
             EwsUtilities.ValidateDomainNameAllowNull(domain, "domain");
 
@@ -1671,8 +1669,9 @@ namespace Microsoft.Exchange.WebServices.Autodiscover
         internal AutodiscoverService(
             Uri url,
             string domain,
-            ExchangeVersion requestedServerVersion)
-            : base(requestedServerVersion)
+            ExchangeVersion requestedServerVersion,
+            IHttpMessageHandlerFactory httpMessageHandlerFactory = null)
+            : base(requestedServerVersion, httpMessageHandlerFactory)
         {
             EwsUtilities.ValidateDomainNameAllowNull(domain, "domain");
 
@@ -1686,8 +1685,8 @@ namespace Microsoft.Exchange.WebServices.Autodiscover
         /// </summary>
         /// <param name="service">The other service.</param>
         /// <param name="requestedServerVersion">The requested server version.</param>
-        internal AutodiscoverService(ExchangeServiceBase service, ExchangeVersion requestedServerVersion)
-            : base(service, requestedServerVersion)
+        internal AutodiscoverService(ExchangeServiceBase service, ExchangeVersion requestedServerVersion, IHttpMessageHandlerFactory httpMessageHandlerFactory = null)
+            : base(service, requestedServerVersion, httpMessageHandlerFactory)
         {
             this.dnsClient = new AutodiscoverDnsClient(this);
         }
@@ -1696,8 +1695,8 @@ namespace Microsoft.Exchange.WebServices.Autodiscover
         /// Initializes a new instance of the <see cref="AutodiscoverService"/> class.
         /// </summary>
         /// <param name="service">The service.</param>
-        internal AutodiscoverService(ExchangeServiceBase service)
-            : this(service, service.RequestedServerVersion)
+        internal AutodiscoverService(ExchangeServiceBase service, IHttpMessageHandlerFactory httpMessageHandlerFactory = null)
+            : this(service, service.RequestedServerVersion, httpMessageHandlerFactory)
         {
         }
 
