@@ -187,8 +187,14 @@ namespace Microsoft.Exchange.WebServices.Data
                     {
                         throw new ServiceLocalException(Strings.CredentialsRequired);
                     }
-                    // Make sure that credentials have been authenticated if required
-                    serviceCredentials.PreAuthenticate();
+
+					// taken from https://github.com/sherlock1982/ews-managed-api/commit/90c782028de5518dcfe6b8d3eb8584cdd58a8a04
+					// Temporary fix for authentication on Linux platform
+					if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+						serviceCredentials = AdjustLinuxAuthentication(url, serviceCredentials);
+
+					// Make sure that credentials have been authenticated if required
+					serviceCredentials.PreAuthenticate();
 
                     // Apply credentials to the request
                     serviceCredentials.PrepareWebRequest(request);
@@ -217,12 +223,14 @@ namespace Microsoft.Exchange.WebServices.Data
             var networkCredentials = ((WebCredentials)serviceCredentials).Credentials as NetworkCredential;
             if (networkCredentials != null)
             {
-                CredentialCache credentialCache = new CredentialCache();
-                credentialCache.Add(url, "NTLM", networkCredentials);
-                credentialCache.Add(url, "Digest", networkCredentials);
-                credentialCache.Add(url, "Basic", networkCredentials);
+				CredentialCache credentialCache = new CredentialCache
+				{
+					{ url, "NTLM", networkCredentials },
+					{ url, "Digest", networkCredentials },
+					{ url, "Basic", networkCredentials }
+				};
 
-                serviceCredentials = credentialCache;
+				serviceCredentials = credentialCache;
             }
             return serviceCredentials;
         }

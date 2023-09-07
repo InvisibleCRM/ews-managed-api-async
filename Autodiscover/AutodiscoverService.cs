@@ -649,7 +649,16 @@ namespace Microsoft.Exchange.WebServices.Autodiscover
                 TraceFlags.AutodiscoverConfiguration,
                 string.Format("Trying to get Autodiscover host from DNS SRV record for {0}.", domainName));
 
-            string hostname = this.dnsClient.FindAutodiscoverHostFromSrv(domainName);
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				this.TraceMessage(
+					TraceFlags.AutodiscoverConfiguration,
+					"Autodiscover DNS SRV method is supported only on Windows currently.");
+
+				return null;
+			}
+
+			string hostname = this.dnsClient.FindAutodiscoverHostFromSrv(domainName);
             if (!string.IsNullOrEmpty(hostname))
             {
                 this.TraceMessage(

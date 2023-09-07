@@ -1,10 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>2.2.9</VersionPrefix>
     <TargetFrameworks>netstandard2.1</TargetFrameworks>
-    <AssemblyName>Microsoft.Exchange.WebServices.NETStandard</AssemblyName>
-    <PackageId>Comless.Exchange.WebServices.NETStandard</PackageId>
+    <AssemblyName>Microsoft.Exchange.WebServices.NETStandard.Async</AssemblyName>
+    <PackageId>RevenueGrid.Exchange.WebServices.NETStandard.Async</PackageId>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -12,16 +11,16 @@
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>scttstrck</Authors>
-    <RepositoryUrl>https://github.com/scttstrck/ews-managed-api</RepositoryUrl>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Authors>RevenueGrid</Authors>
+    <RepositoryUrl>https://github.com/InvisibleCRM/ews-managed-api-async</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>ews exchange office365 Microsoft Web API Email Client Library C#</PackageTags>
-    <PackageProjectUrl>https://github.com/scttstrck/ews-managed-api</PackageProjectUrl>
-    <Title>Microsoft.Exchange.WebServices.NETStandard</Title>
-    <Description>The Exchange Web Services (EWS) Managed API provides a managed interface for developing .NET client applications that use EWS. By using the EWS Managed API, you can access almost all the information stored in an Office 365, Exchange Online, or Exchange Server mailbox.</Description>
+    <PackageProjectUrl>https://github.com/InvisibleCRM/ews-managed-api-async</PackageProjectUrl>
+    <Title>Microsoft.Exchange.WebServices.NETStandard.Async</Title>
+    <Description>The Exchange Web Services (EWS) Managed API provides a managed asynchronous interface for developing .NET client applications that use EWS. By using the EWS Managed API, you can access almost all the information stored in an Office 365, Exchange Online, or Exchange Server mailbox.</Description>
     <PackageReleaseNotes>
-      removed obsolete WebRequests and switched to HttpClient internally
+      removed obsolete WebRequests and switched to IHttpMessageHandlerFactory internally
       fixed issue with file attachements downloads
       restored ldap autodiscover functionality
       merged changes from official Microsoft repository
@@ -29,9 +28,9 @@
       merged changes from other repos: svrooij dimdron real-magic
       targeting netstandard2.1
     </PackageReleaseNotes>
-    <Version>2.2.9</Version>
     <PackageLicenseExpression></PackageLicenseExpression>
     <PackageLicenseFile>license.txt</PackageLicenseFile>
+	<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <ItemGroup>
