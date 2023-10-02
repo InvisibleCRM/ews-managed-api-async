@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.Exchange.WebServices.Data;
 using Microsoft.Exchange.WebServices.NETStandard.Extensions;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Exchange.WebServices.NETStandard.Core
 {
@@ -50,7 +51,12 @@ namespace Microsoft.Exchange.WebServices.NETStandard.Core
 
         private bool UseDedicatedHandler()
         {
-            return Credentials is NetworkCredential;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return Credentials is NetworkCredential;
+            }
+
+            return Credentials is CredentialCache;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
